@@ -1,5 +1,5 @@
 /* prod_condvar.c
-
+ * 对静态条件变量的学习
    A simple POSIX threads producer-consumer example using a condition variable.
 */
 #include <time.h>
@@ -7,12 +7,11 @@
 #include "tlpi_hdr.h"
 
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;  //静态条件变量
 
 static int avail = 0;
 
-static void *
-threadFunc(void *arg)
+static void *threadFunc(void *arg)
 {
     int cnt = atoi((char *) arg);
     int s, j;
@@ -32,8 +31,9 @@ threadFunc(void *arg)
         if (s != 0)
             errExitEN(s, "pthread_mutex_unlock");
 
-        s = pthread_cond_signal(&cond);         /* Wake sleeping consumer */
-        if (s != 0)
+       /* s = pthread_cond_signal(&cond);  */       /* Wake sleeping consumer */ 
+         s = pthread_cond_signal(&cond); //发送信号
+		if (s != 0)
             errExitEN(s, "pthread_cond_signal");
     }
 
@@ -75,7 +75,7 @@ main(int argc, char *argv[])
             errExitEN(s, "pthread_mutex_lock");
 
         while (avail == 0) {            /* Wait for something to consume */
-            s = pthread_cond_wait(&cond, &mtx);
+            s = pthread_cond_wait(&cond, &mtx);   //阻塞等待
             if (s != 0)
                 errExitEN(s, "pthread_cond_wait");
         }
