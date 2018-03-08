@@ -1,7 +1,7 @@
 /*
  * socket_server_udp.c
  * Author: panda1949
- * Date: 2018年3月7日
+ * Date: 2018年3月8日
  * Copyright:
  * brief:UDP Server 基于数据报的服务器端
  */
@@ -18,16 +18,16 @@
 
 #define  MAXDATASIZE		100
 
-
 int main()
 {
+	char feedback[] = "welcome my server\n";
 	int sockfd;
+	//服务器地址信息
 	struct sockaddr_in serveraddr;
+	//客户端地址信息
 	struct sockaddr_in clientaddr;
 	socklen_t sin_size;
-	int num,len;
-	char feedback[] = "welcome my server\n";
-
+	int num;
 	//接收缓冲区
 	char message[MAXDATASIZE];
 
@@ -49,7 +49,6 @@ int main()
 	}
 
 	sin_size = sizeof(struct sockaddr_in);
-	len = sizeof(struct sockaddr_in);
 
 	printf("============message received zoom========== \n");
 	while(1)
@@ -63,16 +62,11 @@ int main()
 		}
 
 		message[num] = '\n';
-//		if(inet_ntop((AF_INET,&clientaddr.sin_addr),message,INET_ADDRSTRLEN) == NULL )
-		if(inet_ntop(AF_INET,&clientaddr.sin_addr.s_addr,message,INET_ADDRSTRLEN))
-		{
-			printf("convert client address failed \n");
-			exit(1);
-		}
-		printf("The received message from:  %s\n the message is %s \n",ntohs(clientaddr.sin_addr.s_addr),message);
+
+		printf("The received message from:  %s\n the message is %s \n",inet_ntoa(clientaddr.sin_addr),message);
 		//向客户端发送回馈信息
-		sendto(sockfd,feedback,num,0,
-				(struct sockaddr *)&clientaddr,len);
+		sendto(sockfd,feedback,18,0,
+				(struct sockaddr *)&clientaddr,sin_size);
 		//如果消息是退出则关闭服务器
 		if(!strcmp(message,"quit"))
 			break;
@@ -83,7 +77,6 @@ int main()
 	return 0;
 
 }
-
 
 
 
